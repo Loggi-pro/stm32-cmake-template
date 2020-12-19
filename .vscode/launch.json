@@ -1,0 +1,61 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "cortex-debug",
+      "request": "launch",
+      "name": "Debug (JLink)",
+      "cwd": "${workspaceFolder}",
+      "executable": "${command:cmake.launchTargetPath}",
+      "runToMain": true,
+      "interface": "swd",
+      "servertype": "jlink", //st-link incircuit dbg
+      "v1": false,
+      "device": "STM32F303xB",
+      "svdFile": "${workspaceFolder}/STM32F303.svd",
+      "swoConfig": {
+        "enabled": true,
+        "swoFrequency": 4500000,
+        "cpuFrequency": 72000000,
+        "source": "probe",
+        "decoders": [
+          {
+            "port": 0,
+            "label": "ITM0",
+            "type": "console"
+          }
+        ]
+      },
+      // "showDevDebugOutput": true,
+      "preRestartCommands": [
+          "file ./bin/release/stm32_cmake_template.elf",
+          "load",
+         "monitor reset",
+          "add-symbol-file ./bin/release/stm32_cmake_template.elf 0x08002030",
+         "enable breakpoint",
+      ]
+    },
+    {
+      "name": "Debug (STLink)",
+      "cwd": "${workspaceFolder}",
+      "executable": "./bin/release/stm32_cmake_template.elf",
+      "request": "launch",
+      "type": "cortex-debug",
+      "runToMain": true,
+      "interface": "swd",
+      "servertype": "stutil", //st-link incircuit dbg
+      "v1": false,
+      //"device": "STM32F303VC",
+      "device": "STM32F303xB",
+      "svdFile": "${workspaceFolder}/STM32F303.svd",
+      "swoConfig": {
+        "enabled": true,
+        "swoFrequency": 0,
+        "cpuFrequency": 0
+      }
+    }
+  ]
+}

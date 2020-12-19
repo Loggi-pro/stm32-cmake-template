@@ -1,0 +1,7 @@
+[
+	{
+		"name": "GCC for stm32",
+		"toolchainFile": "${workspaceFolder}/cmake/stm32/entrypoint.cmake",
+		"preferredGenerator": { "name": "Ninja" }
+	}
+]

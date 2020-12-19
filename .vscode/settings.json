@@ -1,0 +1,15 @@
+{
+	"cmake.configureOnOpen": true,
+	//"cmake.buildArgs": ["-v"], //for verbose build
+	"cmake.configureSettings": {
+		"PROJECT_NAME": "${workspaceFolderBasename}",
+		"CMAKE_EXPORT_COMPILE_COMMANDS": "1", //Generate compile_commands.json
+		"MCU": "STM32F303xC",
+		"F_CPU": "72000000",
+		"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${workspaceFolder}/bin/${buildType}/",
+		"TOOLCHAIN_PATH": "${env:LIB}/Arm/armcc/",
+		"STM32Cube_DIR": "${env:LIB}/Arm/STM32Cube_FW_F3_V1.10.0/",
+		"CPPTOOL_PATH": "${workspaceFolder}/.vscode/c_cpp_properties.json",
+	},
+
+}
