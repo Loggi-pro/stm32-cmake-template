@@ -2,9 +2,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.19)
 PROJECT(stm32-template)
 FIND_PACKAGE(CMSIS REQUIRED)
 FIND_PACKAGE(STM32HAL COMPONENTS gpio tim pcd pwr adc dma rtc uart i2c flash REQUIRED)
+FIND_PACKAGE(Void REQUIRED)
 #configure
 set(MCU STM32F303xC)
-#set(F_CPU 72000000)
+set(F_CPU 72000000)
 
 #create executable
 add_stm_executable(stm32-template ${MCU} src/main.cpp)
@@ -22,6 +23,11 @@ set_project_warnings(project_warnings)
 target_link_libraries(stm32-template.elf PRIVATE project_options project_warnings)
 add_cmsis_library(stm32-template)
 add_hal_library(stm32-template)
+#configure void library
+configure_void_library(NAME void-stm32 MCU ${MCU} F_CPU ${F_CPU})
+target_link_libraries(void-stm32 PRIVATE cmsis) #depends from cmsis
+#link target with options
+target_link_libraries(stm32-template.elf PRIVATE void-stm32 project_options project_warnings)
 print_size_details(stm32-template)
 #configure cpptools for better syntax highlight for vscode
 #CPPTOOL_PATH - path to generated file c_cpp_properties.json
