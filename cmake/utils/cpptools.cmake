@@ -7,10 +7,17 @@ FUNCTION(PREPEND var prefix)
    SET(${var} "${listVar}" PARENT_SCOPE)
 ENDFUNCTION(PREPEND)
 
-function(configure_cpptools target CPPTOOLSFILE_PATH)
+function(configure_cpptools)
 	list(APPEND CMAKE_MESSAGE_CONTEXT "cpptools")
+    set(singleValues TARGET PATH)
+    include(CMakeParseArguments)
+    cmake_parse_arguments(ARG "" "${singleValues}" "" ${ARGN})
+    if (NOT ARG_PATH)
+        SET(ARG_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.vscode/c_cpp_properties.json)
+        MESSAGE(STATUS "PATH not specified, used default:  ${ARG_PATH}")
+    endif()
     include(FindPythonInterp)
-	get_target_property(TARGET_NAME ${target} OUTPUT_NAME)
+	get_target_property(TARGET_NAME ${ARG_TARGET} OUTPUT_NAME)
     #CURRENT_DIR=cmake/utils
     if (NOT EXISTS "${PYTHON_EXECUTABLE}"  OR NOT  EXISTS "${CURRENT_DIR}/../utils/gen-cpp-properties.py")
         return()
@@ -49,9 +56,9 @@ function(configure_cpptools target CPPTOOLSFILE_PATH)
 	IF(CMAKE_EXPORT_COMPILE_COMMANDS)
 		SET(COMPILE_COMMANDS ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json)
 	ENDIF()	
-	MESSAGE(VERBOSE "Using CPPTOOLSFILE_PATH=${CPPTOOLSFILE_PATH}")	
+	MESSAGE(VERBOSE "Using CPPTOOLSFILE_PATH=${ARG_PATH}")
 	
-	execute_process(COMMAND ${PYTHON_EXECUTABLE} ${CURRENT_DIR}/../utils/gen-cpp-properties.py "--file=${CPPTOOLSFILE_PATH}"  ${force_include_list_path} ${compile_defines} ${include_dirs}  "-cc=${COMPILE_COMMANDS}"
+	execute_process(COMMAND ${PYTHON_EXECUTABLE} ${CURRENT_DIR}/../utils/gen-cpp-properties.py "--file=${ARG_PATH}"  ${force_include_list_path} ${compile_defines} ${include_dirs}  "-cc=${COMPILE_COMMANDS}"
 					WORKING_DIRECTORY ${CURRENT_DIR}
 					RESULT_VARIABLE rv
 					)

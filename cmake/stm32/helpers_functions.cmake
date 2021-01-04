@@ -71,9 +71,31 @@ FUNCTION(STM32_SET_TARGET_PROPERTIES TARGET MCU)
         MESSAGE(FATAL_ERROR "Unknown chip: ${MCU}")
     endif()
     STM32_SET_FLASH_PARAMS(${TARGET} ${STM32_FLASH_SIZE} ${STM32_RAM_SIZE})
-    math(EXPR F_CPU_MHZ ${F_CPU}/1000000)
-    MESSAGE(STATUS "${MCU} (${F_CPU_MHZ} MHz) has ${STM32_FLASH_SIZE}b of flash memory and ${STM32_RAM_SIZE}b of RAM")
-    #SET_TARGET_PROPERTIES(${TARGET} PROPERTIES SUFFIX ".elf")
+    MESSAGE(STATUS "${MCU} has ${STM32_FLASH_SIZE}b of flash memory and ${STM32_RAM_SIZE}b of RAM")
+ENDFUNCTION()
+
+
+FUNCTION(STM32_ADD_CHIP_PROPERTIES TARGET MCU)
+        STM32_CHIP_GET_OPTIONS(${MCU}
+                CHIP_C_OPTIONS
+                CHIP_CXX_OPTIONS
+                CHIP_ASM_OPTIONS
+                CHIP_EXE_LINKER_OPTIONS
+                CHIP_MODULE_LINKER_OPTIONS
+                CHIP_SHARED_LINKER_OPTIONS)
+        foreach(C_COMPILE_OPTIONS ${CHIP_C_OPTIONS})
+        target_compile_options( ${TARGET} PUBLIC $<$<COMPILE_LANGUAGE:C>:${C_COMPILE_OPTIONS}>)
+        endforeach()
+
+        foreach(CXX_COMPILE_OPTIONS ${CHIP_CXX_OPTIONS})
+        target_compile_options( ${TARGET} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${CXX_COMPILE_OPTIONS}>)
+        endforeach()
+
+        foreach(CXX_COMPILE_OPTIONS ${CHIP_ASM_OPTIONS})
+        target_compile_options( ${TARGET} PUBLIC $<$<COMPILE_LANGUAGE:ASM>:${CXX_COMPILE_OPTIONS}>)
+        endforeach()
+        #add link flags
+        target_link_options(${TARGET} PUBLIC ${CHIP_EXE_LINKER_OPTIONS})
 ENDFUNCTION()
 
 FUNCTION(STM32_SET_HSE_VALUE TARGET STM32_HSE_VALUE)

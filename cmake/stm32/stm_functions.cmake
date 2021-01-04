@@ -30,22 +30,9 @@ function(add_stm_executable EXECUTABLE_NAME MCU)
 	# elf file
 	add_executable(${elf_file} EXCLUDE_FROM_ALL ${ARGN})
 	STM32_SET_TARGET_PROPERTIES(${elf_file} ${MCU})
-	
-	foreach(C_COMPILE_OPTIONS ${CHIP_C_OPTIONS})
-		target_compile_options( ${elf_file} PUBLIC $<$<COMPILE_LANGUAGE:C>:${C_COMPILE_OPTIONS}>)
-	endforeach()
+	STM32_ADD_CHIP_PROPERTIES(${elf_file} ${MCU})
 
-	foreach(CXX_COMPILE_OPTIONS ${CHIP_CXX_OPTIONS})
-		target_compile_options( ${elf_file} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${CXX_COMPILE_OPTIONS}>)
-	endforeach()	
-
-	foreach(CXX_COMPILE_OPTIONS ${CHIP_ASM_OPTIONS})
-		target_compile_options( ${elf_file} PUBLIC $<$<COMPILE_LANGUAGE:ASM>:${CXX_COMPILE_OPTIONS}>)
-	endforeach()	
-	#add link flags
-	target_link_options(${elf_file} PUBLIC ${CHIP_EXE_LINK_OPTIONS})
-
-	target_compile_definitions(${elf_file} PUBLIC -DMCU=${MCU} -DF_CPU=${F_CPU})
+	target_compile_definitions(${elf_file} PUBLIC -DMCU=${MCU})
 	
 	get_target_property(LINK_OPTS ${elf_file} LINK_OPTIONS)
 	message(STATUS "LINKER OPTIONS: ${LINK_OPTS}")

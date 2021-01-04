@@ -279,9 +279,12 @@ function(add_hal_library TARGET)
         endif()
     endforeach()
 
- 
+    get_target_inherited_property(INCLUDE_DIRECTORIES ${TARGET_NAME} INCLUDE_DIRECTORIES) #for finding hal_conf file
 
-	copy_target_properites_to(${TARGET_NAME} PRIVATE ${new_target})
+    target_include_directories(${new_target}   PRIVATE ${INCLUDE_DIRECTORIES})
+
+    STM32_SET_TARGET_PROPERTIES(${new_target} ${MCU})
+    STM32_ADD_CHIP_PROPERTIES(${new_target} ${MCU})
     target_compile_features(${new_target} PRIVATE cxx_std_17)
     
     target_include_directories(${new_target} PUBLIC ${STM32HAL_INCLUDE_DIR})
