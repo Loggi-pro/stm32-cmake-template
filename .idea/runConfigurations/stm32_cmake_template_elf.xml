@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="stm32_cmake_template.elf" type="com.jetbrains.cidr.embedded.customgdbserver.type" factoryName="com.jetbrains.cidr.embedded.customgdbserver.factory" nameIsGenerated="true" PROGRAM_PARAMS="-f interface/jlink.cfg -c &quot;transport select swd&quot; -f target/stm32f3x.cfg" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="stm32_cmake_template" TARGET_NAME="stm32_cmake_template.elf" CONFIG_NAME="Debug-ARM" version="1" RUN_TARGET_PROJECT_NAME="stm32_cmake_template" RUN_TARGET_NAME="stm32_cmake_template.elf">
-    <custom-gdb-server version="1" gdb-connect="localhost:3333" executable="I:\Nextcloud\LIBRARIES\Arm\OpenOCD\bin\openocd.exe" warmup-ms="0" download-type="ALWAYS" reset-cmd="monitor reset break main" reset-after-download="true" />
-    <method v="2">
-      <option name="CLION.COMPOUND.BUILD" enabled="true" />
-    </method>
-  </configuration>
-</component>

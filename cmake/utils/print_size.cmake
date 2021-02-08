@@ -43,3 +43,8 @@ function (print_size EXECUTABLE_NAME)
 	endif()
 	list(POP_BACK CMAKE_MESSAGE_CONTEXT)
 endfunction(print_size)
+
+function (print_size_all EXECUTABLE_NAME)
+	PRINT_SIZE_ALL_SOURCES(${EXECUTABLE_NAME})
+endfunction()
+

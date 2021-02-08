@@ -22,7 +22,7 @@ set_project_warnings(project_warnings)
 target_link_libraries(stm32-template.elf PRIVATE project_options project_warnings)
 add_cmsis_library(stm32-template)
 add_hal_library(stm32-template)
-
+print_size_all(stm32-template)
 #configure cpptools for better syntax highlight for vscode
 #CPPTOOL_PATH - path to generated file c_cpp_properties.json
 #configure_cpptools(TARGET template_project PATH ${CPPTOOL_PATH})
