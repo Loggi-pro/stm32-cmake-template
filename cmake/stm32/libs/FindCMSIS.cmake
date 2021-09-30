@@ -32,37 +32,54 @@ function(generate_startup_file TARGET_NAME FAMILY FILENAME OUT_FILEPATH STM32Cub
 
     SET(startup_src_file SRC_FILE-NOTFOUND)
     FIND_FILE(startup_src_file ${FILENAME}
-        PATH_SUFFIXES src stm32${FAMILY_LOWER} cmsis
-        HINTS ${STM32Cube_DIR}/Drivers/CMSIS/Device/ST/STM32${FAMILY}xx/Source/Templates/gcc/
-        CMAKE_FIND_ROOT_PATH_BOTH
-    )
-
+            PATH_SUFFIXES src sources stm32${FAMILY_LOWER} cmsis
+            HINTS ${STM32Cube_DIR}/Drivers/CMSIS/Device/ST/STM32${FAMILY}xx/Source/Templates/gcc/
+            CMAKE_FIND_ROOT_PATH_BOTH
+            )
 
 
     if (EXISTS ${startup_src_file})
         MESSAGE(DEBUG "Startup file found: ${startup_src_file}")
-    else()
+    else ()
         MESSAGE(DEBUG "Startup file not found")
         list(POP_BACK CMAKE_MESSAGE_CONTEXT)
         return()
-    endif()
+    endif ()
 
     #try to find path to save file
     set(src_folder ${include_dirs})
-    set(save_path ${CMAKE_SOURCE_DIR}/startup)
-    set(RESULT ${save_path}/${FILENAME})
+    set(RESULT ${OUTPUT_DIR}/${FILENAME})
     MESSAGE(DEBUG "Write at path: ${save_path}")
     #write file
     file(READ ${startup_src_file} filedata)
-    file(WRITE  ${save_path}/${FILENAME} "${filedata}")
+    file(WRITE ${OUTPUT_DIR}/${FILENAME} "${filedata}")
     SET(${OUT_FILEPATH} ${RESULT} PARENT_SCOPE)
     list(POP_BACK CMAKE_MESSAGE_CONTEXT)
 endfunction()
 
 
 #Use MCU PROPERTY OF TARGET
+# NAME
+# STARTUP_OUTPUT_DIR - dir of generated startup file
 function(add_cmsis_library TARGET)
     list(APPEND CMAKE_MESSAGE_CONTEXT "cmsis")
+
+    set(singleValues NAME STARTUP_OUTPUT_DIR)
+    include(CMakeParseArguments)
+    cmake_parse_arguments(ARG "" "${singleValues}" "" ${ARGN})
+    if (NOT ARG_NAME)
+        MESSAGE(STATUS "NAME not specified, used default:  libcmsis")
+        set(new_target libcmsis)
+    else ()
+        set(new_target ${ARG_NAME})
+    endif ()
+    MESSAGE(STARTUP_OUTPUT_DIR=${STARTUP_OUTPUT_DIR})
+    if (NOT ARG_STARTUP_OUTPUT_DIR)
+        MESSAGE(STATUS "STARTUP_OUTPUT_DIR not specified, used default:  ${CMAKE_SOURCE_DIR}/startup")
+        SET(ARG_STARTUP_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/startup")
+    endif ()
+
+
     get_target_property(TARGET_NAME ${TARGET} OUTPUT_NAME)
     get_target_property(MCU ${TARGET} MCU)
     STM32_CHIP_GET_FAMILY(${MCU} FAMILY)
@@ -224,15 +241,15 @@ function(add_cmsis_library TARGET)
         LIST(APPEND CMSIS_SOURCES ${CMSIS_${SRC_CLEAN}_FILE})
     ENDFOREACH()
 
-    IF(CHIP_TYPE)
-        generate_startup_file(${TARGET_NAME} ${FAMILY} ${CMSIS_STARTUP_SOURCE} OUT_FILEPATH ${STM32Cube_DIR})
+    IF (CHIP_TYPE)
+        generate_startup_file(${TARGET_NAME} ${FAMILY} ${CMSIS_STARTUP_SOURCE} ${ARG_STARTUP_OUTPUT_DIR} ${STM32Cube_DIR})
+        SET(OUT_FILEPATH ${ARG_STARTUP_OUTPUT_DIR}/${CMSIS_STARTUP_SOURCE})
+        MESSAGE(STATUS "Generate startup at ${OUT_FILEPATH}")
         if (EXISTS ${OUT_FILEPATH})
             LIST(APPEND CMSIS_SOURCES ${OUT_FILEPATH})
-            MESSAGE(STATUS "Generate startup file: ${OUT_FILEPATH}")
-        endif()
-    ENDIF()
-    
-    set(new_target cmsis)
+            #MESSAGE(STATUS "Generate startup file: ${OUT_FILEPATH}")
+        endif ()
+    ENDIF ()
     
     add_library(${new_target} ${CMSIS_SOURCES})
     foreach (SOURCE_FILE ${CMSIS_SOURCES})

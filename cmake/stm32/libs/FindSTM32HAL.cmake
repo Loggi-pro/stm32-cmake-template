@@ -72,29 +72,42 @@ function(generate_hal_conf_file TARGET_NAME FAMILY STM32Cube_DIR)
     if (size GREATER_EQUAL 1)
         LIST(GET src_folder 0 filepath)
         MESSAGE(DEBUG "Select 'src' folder")
-    else()
-    #else take any folder
+    else ()
+        #else take any folder
         MESSAGE(DEBUG "Select first found folder")
         LIST(GET include_dirs 0 filepath)
-    endif()
+    endif ()
     MESSAGE(DEBUG "Write at path: ${filepath}")
     MESSAGE(VERBOSE "Generate config hal file: ${filepath}")
     #write file
-    file(WRITE   ${filepath}/stm32${STM32_FAMILY_LOWER}xx_hal_conf.h "${filedata}")
+    file(WRITE ${filepath}/stm32${STM32_FAMILY_LOWER}xx_hal_conf.h "${filedata}")
     list(POP_BACK CMAKE_MESSAGE_CONTEXT)
 endfunction()
 
+#ARGS: ${TARGET}
+# NAME
 function(add_hal_library TARGET)
     list(APPEND CMAKE_MESSAGE_CONTEXT "hal")
+
+    set(singleValues NAME)
+    include(CMakeParseArguments)
+    cmake_parse_arguments(ARG "" "${singleValues}" "" ${ARGN})
+    if (NOT ARG_NAME)
+        MESSAGE(STATUS "NAME not specified, used default:  libhal")
+        set(new_target libhal)
+    else ()
+        set(new_target ${ARG_NAME})
+    endif ()
+
     MESSAGE(STATUS "HAL components required: ${STM32_COMPONENTS_REQUIRED}")
     get_target_property(TARGET_NAME ${TARGET} OUTPUT_NAME)
     get_target_property(MCU ${TARGET} MCU)
     STM32_CHIP_GET_FAMILY(${MCU} FAMILY)
 
-    IF(FAMILY STREQUAL "F0")
+    IF (FAMILY STREQUAL "F0")
         SET(HAL_COMPONENTS adc can cec comp cortex crc dac dma flash gpio i2c
-                        i2s irda iwdg pcd pwr rcc rtc smartcard smbus
-                        spi tim tsc uart usart wwdg)
+                i2s irda iwdg pcd pwr rcc rtc smartcard smbus
+                spi tim tsc uart usart wwdg)
 
         SET(HAL_REQUIRED_COMPONENTS cortex pwr rcc)
 
@@ -245,7 +258,8 @@ function(add_hal_library TARGET)
 
     LIST(REMOVE_DUPLICATES HAL_HEADERS)
     LIST(REMOVE_DUPLICATES HAL_SRCS)
-
+#    LIST(APPEND HAL_SRCS ${HAL_HEADERS})
+#    LIST(REMOVE_ITEM HAL_SRCS "HAL_stm32f4xx_hal_h_FILE-NOTFOUND")
     STRING(TOLOWER ${FAMILY} STM32_FAMILY_LOWER)
 
     FIND_PATH(STM32HAL_INCLUDE_DIR ${HAL_HEADERS}
@@ -270,7 +284,6 @@ function(add_hal_library TARGET)
     generate_defines(DEFINES)
     ##
 
-    set(new_target hal)
     add_library(${new_target} ${STM32HAL_SOURCES})
     foreach (SOURCE_FILE ${STM32HAL_SOURCES})
         get_filename_component(EXTENSION ${SOURCE_FILE} LAST_EXT)
