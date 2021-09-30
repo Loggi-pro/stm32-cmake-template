@@ -9,6 +9,7 @@ Setup variables in `.vscode\settings.json`:
 ```json
 "TOOLCHAIN_PATH": path to toolchain (example: "disk:/folder/Arm/armcc/")
 "STM32Cube_DIR": path to cmsis\hal\cube dir (example: "disk:/folder/Arm/STM32Cube_FW_F3_V1.10.0/")
+"VOID_LIB_PATH": path to void lib (optional)
 ```
 
 ### Setup for CLion:
@@ -18,6 +19,7 @@ Setup variables in `.vscode\settings.json`:
     ```cmake
     -DCMAKE_TOOLCHAIN_FILE:FILEPATH=cmake/stm32/entrypoint.cmake
     -DSTM32Cube_DIR:STRING=I:/Nextcloud/LIBRARIES/Arm/STM32Cube_FW_F3_V1.10.0/
+    -DVOID_LIB_PATH:FILEPATH: path to void lib (optional)
     -G Ninja
     ```
 3. Change `project_name` `MCU` and `F_CPU` in [CMakeLists.txt](/CMakeLists.txt) file.
